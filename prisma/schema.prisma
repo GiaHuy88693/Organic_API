@@ -1,282 +1,408 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
-
 
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+  SUSPENDED
+}
+
 model User {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  email            String    @unique
-  password         String
-  firstName        String
-  lastName         String
-  phone            String
-  address          String?
-  city             String?
-  state            String?
-  country          String    @default("VN")
-  postalCode       String?
-  dateOfBirth      DateTime?
-  profilePicture   String?
-  linkedInUrl      String?
-  githubUrl        String?
-  portfolioUrl     String?
-  personalWebsite  String?
-  profileSummary   String?
-  role             String    @default("client")
-  subscriptionPlan String    @default("free")
-  subscriptionExpiry DateTime?
-  isEmailVerified  Boolean   @default(false)
-  isPhoneVerified  Boolean   @default(false)
-  lastLoginAt      DateTime?
-  timezone         String    @default("Asia/Ho_Chi_Minh")
-  language         String    @default("vi")
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  isActive         Boolean   @default(true)
-  deletedAt        DateTime?
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  email          String    @unique
+  password       String
+  fullname       String
+  username       String?
+  phoneNumber    String
+  avatar      	 String?   
+	dateOfBirth    DateTime?
+  roleId         String    @db.ObjectId
+  role           Role      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  totpSecret     String?   
+  status         UserStatus @default(INACTIVE)
 
-  // Auth Relations
-  userRoles              UserRole[]
-  userPermissions        UserPermission[]
-  refreshTokens          RefreshToken[]
-  devices                Device[]
-  loginSessions          LoginSession[]
-  verificationCodes      VerificationCode[]
+  isLocked       Boolean   @default(false)
+  lockExpirationDate  DateTime?  
+  lastViolationId String?  @db.ObjectId  
+  violations     UserViolation[]
+  isEmailVerified Boolean  @default(false)
+  isPhoneVerified Boolean  @default(false)
 
-  rolesCreated           Role[]            @relation("RoleCreatedBy")
-  rolePermissionsGranted RolePermission[]  @relation("RolePermissionGrantedBy")
-  userRolesAssigned      UserRole[]        @relation("UserRoleAssignedBy")
-  userPermissionsGranted UserPermission[]  @relation("UserPermissionGrantedBy")
-  refreshTokensRevoked   RefreshToken[]    @relation("RefreshTokenRevokedBy")
+  createdById     String?  @db.ObjectId
+  createdBy       User?    @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdUsers    User[]   @relation("UserCreatedBy")
+
+  updatedById     String?  @db.ObjectId
+  updatedBy       User?    @relation("UserUpdatedBy", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedUsers    User[]   @relation("UserUpdatedBy")
+
+  deletedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  userRoles       UserRole[]
+  userPermissions UserPermission[]
+  refreshTokens   RefreshToken[]
+  devices         Device[]
+  orders          Order[]
+  wishlists       Wishlist[]
+  carts           Cart[]
+
+  // Audit relations
+  createdCategories Category[] @relation("CategoryCreatedBy")
+  updatedCategories Category[] @relation("CategoryUpdatedBy")
+  createdProducts   Product[]  @relation("ProductCreatedBy")
+  updatedProducts   Product[]  @relation("ProductUpdatedBy")
+  createdOrders     Order[]    @relation("OrderCreatedBy")
+  updatedOrders     Order[]    @relation("OrderUpdatedBy")
+  createdDetails    OrderDetail[] @relation("OrderDetailCreatedBy")
+  updatedDetails    OrderDetail[] @relation("OrderDetailUpdatedBy")
+  createdCarts      Cart[]     @relation("CartCreatedBy")
+  updatedCarts      Cart[]     @relation("CartUpdatedBy")
+  createdRoles      Role[]     @relation("RoleCreatedBy")
+  updatedRoles      Role[]     @relation("RoleUpdatedBy")
+  createdPermissions Permission[] @relation("PermissionCreatedBy")
+  updatedPermissions Permission[] @relation("PermissionUpdatedBy")
+  createdUserRoles  UserRole[] @relation("UserRoleCreatedBy")
+  updatedUserRoles  UserRole[] @relation("UserRoleUpdatedBy")
+  createdRolePermissions RolePermission[] @relation("RolePermissionCreatedBy")
+  updatedRolePermissions RolePermission[] @relation("RolePermissionUpdatedBy")
+  createdViolations UserViolation[] @relation("UserViolationCreatedBy")
 
   @@map("users")
 }
 
 model Role {
-    id               String    @id @default(auto()) @map("_id") @db.ObjectId
-    name             String    @unique // admin, employer, candidate, moderator
-    slug             String    @unique
-    displayName      String
-    description      String?
-    level            Int       @default(0) // Role hierarchy level (0=lowest, 100=highest)
-    isSystemRole     Boolean   @default(false) // Cannot be deleted/modified
-    isActive         Boolean   @default(true)
-    permissions      Json?     // Quick access permissions cache
-    createdBy        String?   @db.ObjectId
-    createdAt        DateTime  @default(now())
-    updatedAt        DateTime  @updatedAt
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique 
+  slug        String    @unique
+  description String?
+  isActive    Boolean   @default(true)
+  createdById   String?  @db.ObjectId
+  createdBy     User?    @relation("RoleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-    // Relations
-    creator          User?     @relation("RoleCreatedBy", fields: [createdBy], references: [id])
-    rolePermissions  RolePermission[]
-    userRoles        UserRole[]
+  updatedById   String?  @db.ObjectId
+  updatedBy     User?    @relation("RoleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-    @@map("roles")
-  }
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@map("roles")
+}
 
 model Permission {
-  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
-  name                 String    @unique // users:read, cvs:create, jobs:delete
-  slug                 String    @unique
-  displayName          String
-  description          String?
-  resource             String    // users, cvs, jobs, companies, etc.
-  action               String    // create, read, update, delete, manage
-  conditions           Json?     // Additional conditions for permission
-  category             String?   // user-management, cv-management, job-management
-  isSystemPermission   Boolean   @default(false)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique 
+  slug        String    @unique
+  displayName String
+  resource    String
+  action      String
+  // ===== Audit fields =====
+  createdById             String?       @db.ObjectId
+  createdBy               User?         @relation("PermissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  // Relations
-  rolePermissions      RolePermission[]
-  userPermissions      UserPermission[]
+  updatedById             String?       @db.ObjectId
+  updatedBy               User?         @relation("PermissionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
 
   @@map("permissions")
 }
 
 model RolePermission {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  roleId        String    @db.ObjectId
-  permissionId  String    @db.ObjectId
-  conditions    Json?     // Role-specific conditions for this permission
-  isGranted     Boolean   @default(true) // true=granted, false=denied
-  grantedBy     String?   @db.ObjectId
-  grantedAt     DateTime  @default(now())
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  roleId       String    @db.ObjectId
+  permissionId String    @db.ObjectId
+  grantedAt    DateTime  @default(now())
 
-  // Relations
-  role          Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission    Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  grantor       User?     @relation("RolePermissionGrantedBy", fields: [grantedBy], references: [id])
+  role        Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  // ===== Audit fields =====
+  createdById               String?             @db.ObjectId
+  createdBy                 User?               @relation("RolePermissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  updatedById               String?             @db.ObjectId
+  updatedBy                 User?               @relation("RolePermissionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@unique([roleId, permissionId])
   @@map("role_permissions")
 }
 
 model UserRole {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String    @db.ObjectId
-  roleId      String    @db.ObjectId
-  assignedBy  String?   @db.ObjectId
-  assignedAt  DateTime  @default(now())
-  expiresAt   DateTime? // Role expiration date, null = permanent
-  isActive    Boolean   @default(true)
-  metadata    Json?     // Additional role assignment metadata
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String   @db.ObjectId
+  roleId   String   @db.ObjectId
+  isActive Boolean  @default(true)
+  assignedAt DateTime @default(now())
 
-  // Relations
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  assignor    User?     @relation("UserRoleAssignedBy", fields: [assignedBy], references: [id])
+  user  User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role  Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  // ===== Audit fields =====
+  createdById        String?    @db.ObjectId
+  createdBy          User?      @relation("UserRoleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  updatedById        String?    @db.ObjectId
+  updatedBy          User?      @relation("UserRoleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@unique([userId, roleId])
   @@map("user_roles")
 }
 
 model UserPermission {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String    @db.ObjectId
-  permissionId  String    @db.ObjectId
-  isGranted     Boolean   @default(true) // true=granted, false=denied (override)
-  conditions    Json?     // User-specific conditions
-  grantedBy     String?   @db.ObjectId
-  grantedAt     DateTime  @default(now())
-  expiresAt     DateTime? // Permission expiration date
-  reason        String?   // Reason for granting/denying this permission
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String    @db.ObjectId
+  permissionId String    @db.ObjectId
+  grantedAt    DateTime  @default(now())
 
-  // Relations
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  permission    Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  grantor       User?     @relation("UserPermissionGrantedBy", fields: [grantedBy], references: [id])
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permissionId])
   @@map("user_permissions")
 }
 
 model RefreshToken {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String    @db.ObjectId
-  token          String    @unique
-  deviceId       String?   @db.ObjectId
-  expiresAt      DateTime
-  isRevoked      Boolean   @default(false)
-  revokedAt      DateTime?
-  revokedBy      String?   @db.ObjectId // Admin who revoked the token
-  revokedReason  String?   // Reason for token revocation
-  lastUsedAt     DateTime?
-  usageCount     Int       @default(0)
-  ipAddress      String?
-  userAgent      String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  deviceId  String   @db.ObjectId
+  token     String   @unique
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // Relations
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  device         Device?   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  revoker        User?     @relation("RefreshTokenRevokedBy", fields: [revokedBy], references: [id])
-  loginSessions  LoginSession[]
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device Device? @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
 }
 
-model Device {
-  id                String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String    @db.ObjectId
-  deviceId          String    @unique // Unique device identifier
-  deviceName        String?   // User-defined device name
-  deviceType        String?   // mobile, desktop, tablet, tv, watch
-  platform          String?   // iOS, Android, Windows, macOS, Linux, Web
-  browser           String?   // Chrome, Firefox, Safari, Edge, etc.
-  browserVersion    String?
-  os                String?   // Operating system
-  osVersion         String?
-  appVersion        String?   // App version if mobile
-  pushToken         String?   // Push notification token
-  fingerprint       String?   // Device fingerprint
-  ipAddress         String?
-  location          Json?     // Last known location {country, city, lat, lng}
-  isTrusted         Boolean   @default(false) // User-marked trusted device
-  isActive          Boolean   @default(true)
-  isBlocked         Boolean   @default(false)
-  lastSeenAt        DateTime?
-  firstSeenAt       DateTime  @default(now())
-  loginCount        Int       @default(0)
-  sessionCount      Int       @default(0) // Number of active sessions
-  maxSessions       Int       @default(5) // Max concurrent sessions
-  twoFactorEnabled  Boolean   @default(false)
-  biometricEnabled  Boolean   @default(false)
-  metadata          Json?     // Additional device metadata
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+model VerificationCode {
+  id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  email String   @unique
+  code  String
+  type  VerificationCodeType
 
-  // Relations
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshTokens     RefreshToken[]
-  loginSessions     LoginSession[]
-  verificationCodes VerificationCode[]
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+
+  @@unique([email, code, type])
+}
+
+model UserViolation {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String    @db.ObjectId
+  reason         String
+  violationType  ViolationType     
+  actionTaken    ActionTaken     
+  lockDurationDays Int?     
+  createdById    String     @db.ObjectId
+  createdBy      User?      @relation("UserViolationCreatedBy", fields: [createdById], references: [id])
+  createdAt      DateTime   @default(now())
+
+  user           User       @relation(fields: [userId], references: [id])
+}
+
+model Device {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String        @db.ObjectId
+  deviceId      String        @unique
+  deviceName    String?
+  userAgent     String
+  ip            String
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  lastActive    DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+
   @@unique([userId, deviceId])
   @@map("devices")
 }
 
-model LoginSession {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String    @db.ObjectId
-  deviceId         String?   @db.ObjectId
-  sessionId        String    @unique
-  refreshTokenId   String?   @db.ObjectId
-  ipAddress        String?
-  userAgent        String?
-  location         Json?     // Login location
-  loginMethod      String?   // password, google, facebook, apple, etc.
-  twoFactorUsed    Boolean   @default(false)
-  loginAt          DateTime  @default(now())
-  lastActivityAt   DateTime?
-  logoutAt         DateTime?
-  isActive         Boolean   @default(true)
-  duration         Int?      // Session duration in seconds
-  metadata         Json?
+model Category {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  image       String?
 
-  // Relations
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  device           Device?   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  refreshToken     RefreshToken? @relation(fields: [refreshTokenId], references: [id])
+  // ===== Audit fields =====
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("CategoryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  @@map("login_sessions")
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("CategoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("categories")
 }
 
-model VerificationCode {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String?   @db.ObjectId
-  email        String?
-  phone        String?
-  code         String
-  hashedCode   String    // Hashed version of code
-  type         String    // email_verification, phone_verification, password_reset, two_factor, login_code
-  purpose      String?   // Specific purpose of verification
-  attempts     Int       @default(0)
-  maxAttempts  Int       @default(3)
-  isUsed       Boolean   @default(false)
-  usedAt       DateTime?
-  expiresAt    DateTime
-  ipAddress    String?
-  userAgent    String?
-  deviceId     String?   @db.ObjectId
-  metadata     Json?     // Additional verification metadata
-  createdAt    DateTime  @default(now())
+model Product {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  price       Int
+  categoryId  String        @db.ObjectId
 
-  // Relations
-  user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  device       Device?   @relation(fields: [deviceId], references: [id])
+  category    Category     @relation(fields: [categoryId], references: [id])
 
-   @@unique([type , code], name: "type_code", map: "type_code")
+  createdById String?  @db.ObjectId
+  createdBy   User?    @relation("ProductCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  updatedById String?  @db.ObjectId
+  updatedBy   User?    @relation("ProductUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  images       ProductImage[]
+  orderDetails OrderDetail[]
+  wishlists    Wishlist[]
+  carts       Cart[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId String  @db.ObjectId
+  imagePath String
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("product_images")
+}
+
+model Order {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String?       @db.ObjectId
+  totalAmount Int
+  // ===== Audit fields =====
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("OrderCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("OrderUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user    User?         @relation(fields: [userId], references: [id])
+  details OrderDetail[]
+
+  @@map("orders")
+}
+
+model OrderDetail {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @db.ObjectId
+  productId String   @db.ObjectId
+  quantity  Int
+  price     Int
+
+  // ===== Audit fields =====
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("OrderDetailCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("OrderDetailUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_details")
+}
+
+model Cart {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String  @db.ObjectId
+  productId String  @db.ObjectId
+  quantity  Int
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  // ===== Audit fields =====
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("CartCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("CartUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+model Wishlist {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  productId String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("wishlists")
+}
+
+enum VerificationCodeType {
+  REGISTER
+  FORGOT_PASSWORD
+  RESET_PASSWORD
+}
+
+enum ActionTaken {
+  WARNING
+  LOCK
+  BAN
+  UNLOCK
+}
+
+enum ViolationType {
+  SPAM
+  CHEAT
+  POLICY_VIOLATION
 }
