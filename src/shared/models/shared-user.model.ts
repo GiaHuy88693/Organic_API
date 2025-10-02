@@ -22,7 +22,12 @@ export const UserSchema = z.object({
     .min(6, { message: 'Phone number must be at least 6 characters long' })
     .max(20, { message: 'Phone number must be at most 20 characters long' }),
   avatar: z.string().nullable(),
-  dateOfBirth: z.date().nullable(),
+  dateOfBirth: z
+    .string()
+    .datetime({ message: 'user.validation.dateOfBirth.invalid' })
+    .transform((val) => new Date(val))
+    .nullable()
+    .optional(),
 
   roleId: z.string().regex(/^[0-9a-fA-F]{24}$/),
   role: z.any().optional(),
@@ -38,9 +43,20 @@ export const UserSchema = z.object({
   isEmailVerified: z.boolean().default(false),
   isPhoneVerified: z.boolean().default(false),
 
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  deletedAt: z.date().nullable(),
+  createdAt: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
+  updatedAt: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
+  deletedAt: z
+    .string()
+    .datetime({ message: 'validation.deletedAt.invalid' })
+    .transform((val) => new Date(val))
+    .nullable()
+    .optional(),
 });
 
 export type UserType = z.infer<typeof UserSchema>;

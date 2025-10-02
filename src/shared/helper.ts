@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { randomInt } from 'crypto'
+import { UserType } from './models/shared-user.model'
 
 // Type Predicates for Prisma Errors
 
@@ -56,3 +57,11 @@ export function coerceUntil(v: unknown): unknown {
   return v
 }
 
+export function mapUserToResponse(user: UserType & { role?: any }) {
+  return {
+    ...user,
+    dateOfBirth: user.dateOfBirth ? user.dateOfBirth.toISOString() : null,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt.toISOString(),
+  };
+}

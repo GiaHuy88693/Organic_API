@@ -222,7 +222,7 @@ export class AuthRepository {
       throw new BadRequestException(ERROR_MESSAGE.AUTH.USER_NOT_FOUND);
     }
 
-    return user;
+    return user
   }
 
   async validateUserStatus(userId: string): Promise<void> {

@@ -38,8 +38,14 @@ export const VerificationCodeSchema = z.object({
     TypeVerifycationCode.FORGOT_PASSWORD,
     TypeVerifycationCode.RESET_PASSWORD,
   ]),
-  expiresAt: z.date(),
-  createdAt: z.date(),
+  expiresAt: z
+    .string()
+    .datetime()
+    .transform((v) => new Date(v)),
+  createdAt: z
+    .string()
+    .datetime()
+    .transform((v) => new Date(v)),
 });
 
 export const SendOTPBodySchema = VerificationCodeSchema.pick({
@@ -69,8 +75,14 @@ export const RoleSchema = z.object({
   slug: z.string(),
   description: z.string().nullable(),
   isActive: z.boolean(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
+  updatedAt: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
 });
 
 export const DeviceSchema = z.object({
@@ -79,8 +91,14 @@ export const DeviceSchema = z.object({
   userAgent: z.string(),
   deviceId: z.string(),
   ip: z.string(),
-  lastActive: z.date(),
-  createdAt: z.date(),
+  lastActive: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
+  createdAt: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
   isActive: z.boolean(),
 });
 
@@ -96,8 +114,14 @@ export const RefreshTokenSchema = z.object({
   token: z.string(),
   userId: z.string(),
   deviceId: z.string(),
-  expiresAt: z.date(),
-  createdAt: z.date(),
+  expiresAt: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
+  createdAt: z
+    .string()
+    .datetime()
+    .transform((val) => new Date(val)),
 });
 
 export const ForgotPasswordSchema = z
@@ -179,10 +203,9 @@ export const UpdateUserProfileSchema = z
       .optional(),
 
     dateOfBirth: z
-      .preprocess((v) => (typeof v === 'string' ? new Date(v) : v), z.date())
-      .refine((d) => !isNaN((d as Date).getTime()), {
-        message: ERROR_MESSAGE.VALIDATION.DOB_INVALID,
-      })
+      .string()
+      .datetime()
+      .transform((v) => new Date(v))
       .optional(),
   })
   .strict();
@@ -199,7 +222,11 @@ export const UserIdParamSchema = z.object({
 export const LockUserBodySchema = z
   .object({
     durationMinutes: z.coerce.number().int().positive().max(525600).optional(),
-    until: z.preprocess(coerceUntil, z.date()).optional(),
+    until: z
+      .string()
+      .datetime()
+      .transform((v) => new Date(v))
+      .optional(),
     reason: z.string().max(500).optional(),
   })
   .refine((v) => !!v.durationMinutes || !!v.until, {
@@ -210,7 +237,11 @@ export const LockUserBodySchema = z
 export const UserLockResSchema = z.object({
   id: z.string(),
   email: z.email().nullable().optional(),
-  lockExpirationDate: z.date().nullable(),
+  lockExpirationDate: z
+    .string()
+    .datetime()
+    .nullable()
+    .transform((v) => (v ? new Date(v) : null)),
   reason: z.string().nullable().optional(),
 });
 
@@ -255,8 +286,15 @@ export const CreateUserViolationResSchema = z
     violationType: z.nativeEnum(ViolationType),
     actionTaken: z.nativeEnum(ActionTaken),
     lockDurationDays: z.number().int().positive().optional().nullable(),
-    createdAt: z.date(),
-    lockExpirationDate: z.date().nullable(),
+    createdAt: z
+      .string()
+      .datetime()
+      .transform((val) => new Date(val)),
+    lockExpirationDate: z
+      .string()
+      .datetime()
+      .nullable()
+      .transform((v) => (v ? new Date(v) : null)),
     createdBy: InfoAdminSchema.nullable().optional(),
   })
   .strict();
