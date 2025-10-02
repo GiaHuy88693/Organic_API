@@ -72,6 +72,8 @@ const EnvSchema = z.object({
   CLOUDINARY_DEFAULT_FOLDER: z.string().default('avatars'),
   CLOUDINARY_PDF_FOLDER: z.string().default('pdfs'),
   SECRET_API_KEY: z.string().min(10),
+  SWAGGER_USERNAME: z.string().min(1, 'SWAGGER_USERNAME cannot be empty'),
+  SWAGGER_PASSWORD: z.string().min(8, 'SWAGGER_PASSWORD must be at least 8 characters'),
 });
 
 // Parse and validate process.env
@@ -110,3 +112,12 @@ export const envConfig = {
   },
   secretApiKey: parsedEnv.data.SECRET_API_KEY,
 };
+
+export const ConfigGroups = {
+  swagger: {
+    username: parsedEnv.data.SWAGGER_USERNAME,
+    password: parsedEnv.data.SWAGGER_PASSWORD,
+  },
+} as const;
+
+export type ConfigGroupsType = typeof ConfigGroups;

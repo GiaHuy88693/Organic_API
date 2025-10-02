@@ -43,6 +43,15 @@ import { ProfileResType, UpdateAvatarResType } from './auth.model';
 import { NoFileProvidedException } from 'src/shared/constants/file-error.constant';
 import { CloudinaryService } from 'src/shared/services/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  loginResponse,
+  logoutResponse,
+  profileResponse,
+  registerResponse,
+  updateProfileResponse,
+  uploadAvatarResponse,
+} from 'src/config/auth.swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -56,6 +65,8 @@ export class AuthController {
    * @returns Registered user info and tokens.
    */
   @Post('register')
+  @ApiOperation({ summary: 'Register new user' })
+  @ApiResponse(registerResponse)
   @IsPublic()
   @ZodSerializerDto(RegisterResDTO)
   async register(@Body() body: RegisterBodyDTO) {
@@ -63,6 +74,7 @@ export class AuthController {
   }
 
   @Post('otp')
+  @ApiOperation({ summary: 'Send otp' })
   @IsPublic()
   @ZodSerializerDto(MessageResDTO)
   async sendOTP(@Body() body: SendOTPBodyDTO) {
@@ -70,6 +82,8 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiOperation({ summary: 'User login' })
+  @ApiResponse(loginResponse)
   @IsPublic()
   @ZodSerializerDto(LoginResDTO)
   async login(
@@ -85,6 +99,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @ApiOperation({ summary: 'Refresh Token' })
   @IsPublic()
   @HttpCode(HttpStatus.OK)
   @ZodSerializerDto(RefreshTokenResDTO)
@@ -102,6 +117,8 @@ export class AuthController {
 
   @Post('logout')
   @Auth([AuthTypes.BEARER])
+  @ApiOperation({ summary: 'Logout from current device' })
+  @ApiResponse(logoutResponse)
   @HttpCode(HttpStatus.OK)
   @ZodSerializerDto(MessageResDTO)
   async logout(@Body() body: LogoutBodyDTO) {
@@ -109,6 +126,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @ApiOperation({ summary: 'Forgot Password' })
   @HttpCode(HttpStatus.OK)
   @IsPublic()
   @ZodSerializerDto(MessageResDTO)
@@ -117,6 +135,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @ApiOperation({ summary: 'Reset Password' })
   @HttpCode(HttpStatus.OK)
   @IsPublic()
   @ZodSerializerDto(MessageResDTO)
@@ -126,6 +145,8 @@ export class AuthController {
 
   @Auth([AuthTypes.BEARER])
   @Get('profile')
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiResponse(profileResponse)
   @HttpCode(HttpStatus.OK)
   @ZodSerializerDto(ProfileResDTO)
   async getProfile(
@@ -136,6 +157,8 @@ export class AuthController {
 
   @Auth([AuthTypes.BEARER])
   @Patch('profile')
+  @ApiOperation({ summary: 'Update user profile' })
+  @ApiResponse(updateProfileResponse)
   @HttpCode(HttpStatus.OK)
   @ZodSerializerDto(ProfileResDTO)
   async updateProfile(
@@ -146,6 +169,7 @@ export class AuthController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all user' })
   @HttpCode(HttpStatus.OK)
   @ZodSerializerDto(GetAllUsersResponseDTO)
   async getAllUsers() {
@@ -153,6 +177,7 @@ export class AuthController {
   }
 
   @Auth([AuthTypes.BEARER])
+  @ApiOperation({ summary: 'Lock user' })
   @Put(':userId/lock')
   @HttpCode(HttpStatus.OK)
   @ZodSerializerDto(UserLockResDTO)
@@ -169,6 +194,7 @@ export class AuthController {
   }
 
   @Auth([AuthTypes.BEARER])
+  @ApiOperation({ summary: 'Unlock user' })
   @Put(':userId/unlock')
   @HttpCode(HttpStatus.OK)
   @ZodSerializerDto(UserLockResDTO)
@@ -183,6 +209,7 @@ export class AuthController {
   }
 
   @Auth([AuthTypes.BEARER])
+  @ApiOperation({ summary: 'Mark violation for user' })
   @Post(':userId/violations')
   @HttpCode(HttpStatus.CREATED)
   @ZodSerializerDto(CreateUserViolationResDTO)
@@ -200,6 +227,9 @@ export class AuthController {
 
   @Auth([AuthTypes.BEARER, AuthTypes.APIKey], { condition: ConditionGuard.OR })
   @Post('avatar')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload avatar' })
+  @ApiResponse(uploadAvatarResponse)
   @UseInterceptors(FileInterceptor('file'))
   @HttpCode(HttpStatus.OK)
   async uploadAvatar(
