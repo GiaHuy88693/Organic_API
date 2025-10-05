@@ -1,6 +1,18 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Patch, Delete, Query, Put } from '@nestjs/common'
-import { ZodSerializerDto } from 'nestjs-zod'
-import { ActiveUser } from 'src/shared/decorator/active-user.decorator'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Patch,
+  Delete,
+  Query,
+  Put,
+} from '@nestjs/common';
+import { ZodSerializerDto } from 'nestjs-zod';
+import { ActiveUser } from 'src/shared/decorator/active-user.decorator';
 import {
   AssignPermissionToRoleDTO,
   AssignPermissionToRoleResDTO,
@@ -10,12 +22,13 @@ import {
   RoleIdParamDTO,
   UserIdParamDTO,
   UpdateRoleBodyDTO,
-} from './dto/role.dto'
-import { RoleService } from './role.service'
-import { AuthTypes, ConditionGuard } from 'src/shared/constants/auth.constant'
-import { Auth } from 'src/shared/decorator/auth.decorator'
-import { MessageResDTO } from '../auth/dto/auth.dto'
-import { parseSkipTake } from 'src/utils/pagination.util'
+} from './dto/role.dto';
+import { RoleService } from './role.service';
+import { AuthTypes, ConditionGuard } from 'src/shared/constants/auth.constant';
+import { Auth } from 'src/shared/decorator/auth.decorator';
+import { MessageResDTO } from '../auth/dto/auth.dto';
+import { parseSkipTake } from 'src/utils/pagination.util';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('role')
 export class RoleController {
@@ -31,9 +44,21 @@ export class RoleController {
   @Auth([AuthTypes.BEARER])
   @Post('create')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create role' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Role created successfully',
+    type: CreateRoleResDTO,
+  })
   @ZodSerializerDto(CreateRoleResDTO)
-  async createRole(@Body() body: CreateRoleBodyDTO, @ActiveUser('userId') userId: string) {
-    return await this.roleService.createRole({ data: body, createdById: userId })
+  async createRole(
+    @Body() body: CreateRoleBodyDTO,
+    @ActiveUser('userId') userId: string,
+  ) {
+    return await this.roleService.createRole({
+      data: body,
+      createdById: userId,
+    });
   }
 
   /**
@@ -47,9 +72,18 @@ export class RoleController {
   @Auth([AuthTypes.BEARER])
   @Post(':roleId/permissions')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Assign permissions to role' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Permissions assigned successfully',
+    type: AssignPermissionToRoleResDTO,
+  })
   @ZodSerializerDto(AssignPermissionToRoleResDTO)
-  async assignPermissionToRole(@Param() params: RoleIdParamDTO, @Body() body: AssignPermissionToRoleDTO) {
-    return await this.roleService.assignPermissionToRole(params.roleId, body)
+  async assignPermissionToRole(
+    @Param() params: RoleIdParamDTO,
+    @Body() body: AssignPermissionToRoleDTO,
+  ) {
+    return await this.roleService.assignPermissionToRole(params.roleId, body);
   }
 
   /**
@@ -64,13 +98,24 @@ export class RoleController {
   @Auth([AuthTypes.BEARER])
   @Put('users/:userId/roles')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Set user role' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User role updated',
+    type: AssignRolesToUserResDTO,
+  })
   @ZodSerializerDto(AssignRolesToUserResDTO)
   async assignRolesToUser(
     @Param() params: UserIdParamDTO,
     @Body() body: RoleIdParamDTO,
     @ActiveUser('userId') userId: string,
   ) {
-    return await this.roleService.assignRolesToUser({ id: params.userId, data: body, updatedById: userId })}
+    return await this.roleService.assignRolesToUser({
+      id: params.userId,
+      data: body,
+      updatedById: userId,
+    });
+  }
   /**
    * Retrieves a list of all roles in the system.
    * Requires Bearer or API Key authentication with Admin role.
@@ -79,9 +124,20 @@ export class RoleController {
   @Auth([AuthTypes.BEARER, AuthTypes.APIKey], { condition: ConditionGuard.OR })
   @Get()
   @HttpCode(HttpStatus.OK)
-  async listRoles(@ActiveUser('userId') userId: number, @Query('skip') skip?: string, @Query('take') take?: string,) {
-    const { skip: parsedSkip, take: parsedTake } = parseSkipTake(skip, take)
-    return this.roleService.listRoles(parsedSkip, parsedTake)
+  @ApiOperation({ summary: 'List roles' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Roles fetched',
+    type: CreateRoleResDTO,
+    isArray: true,
+  })
+  async listRoles(
+    @ActiveUser('userId') userId: number,
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+  ) {
+    const { skip: parsedSkip, take: parsedTake } = parseSkipTake(skip, take);
+    return this.roleService.listRoles(parsedSkip, parsedTake);
   }
 
   /**
@@ -93,8 +149,14 @@ export class RoleController {
   @Auth([AuthTypes.BEARER, AuthTypes.APIKey], { condition: ConditionGuard.OR })
   @Get(':roleId')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get role by id' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Role detail',
+    type: CreateRoleResDTO,
+  })
   async getRole(@Param() params: RoleIdParamDTO) {
-    return await this.roleService.getRoleById(params.roleId)
+    return await this.roleService.getRoleById(params.roleId);
   }
 
   /**
@@ -107,9 +169,18 @@ export class RoleController {
   @Auth([AuthTypes.BEARER, AuthTypes.APIKey], { condition: ConditionGuard.OR })
   @Patch(':roleId')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update role' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Role updated',
+    type: CreateRoleResDTO,
+  })
   @ZodSerializerDto(CreateRoleResDTO)
-  async updateRole(@Param() params: RoleIdParamDTO, @Body() body: UpdateRoleBodyDTO) {
-    return await this.roleService.updateRole(params.roleId, body)
+  async updateRole(
+    @Param() params: RoleIdParamDTO,
+    @Body() body: UpdateRoleBodyDTO,
+  ) {
+    return await this.roleService.updateRole(params.roleId, body);
   }
 
   /**
@@ -121,9 +192,15 @@ export class RoleController {
   @Auth([AuthTypes.BEARER, AuthTypes.APIKey], { condition: ConditionGuard.OR })
   @Delete(':roleId')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete role (soft delete)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Role deleted',
+    type: MessageResDTO,
+  })
   @ZodSerializerDto(MessageResDTO)
   async deleteRole(@Param() params: RoleIdParamDTO) {
-    return await this.roleService.softDeleteRole(params.roleId)
+    return await this.roleService.softDeleteRole(params.roleId);
   }
 
   /**
@@ -135,8 +212,14 @@ export class RoleController {
   @Auth([AuthTypes.BEARER, AuthTypes.APIKey], { condition: ConditionGuard.OR })
   @Patch(':roleId/restore')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Restore role' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Role restored',
+    type: MessageResDTO,
+  })
   @ZodSerializerDto(MessageResDTO)
   async restoreRole(@Param() params: RoleIdParamDTO) {
-    return await this.roleService.restoreRole(params.roleId)
+    return await this.roleService.restoreRole(params.roleId);
   }
 }
