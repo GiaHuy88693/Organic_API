@@ -31,7 +31,7 @@ export const RegisterBodySchema = UserSchema.pick({
 
 export const VerificationCodeSchema = z.object({
   id: z.string(),
-  email: z.email(),
+  email: z.string().email(),
   code: z.string().length(6, 'OTP code must be exactly 6 digits'),
   type: z.enum([
     TypeVerifycationCode.REGISTER,
@@ -121,7 +121,7 @@ export const RefreshTokenSchema = z.object({
 
 export const ForgotPasswordSchema = z
   .object({
-    email: z.email(),
+    email: z.string().email(),
     newPassword: z
       .string()
       .min(6, 'Password must be at least 6 characters long')
@@ -231,7 +231,7 @@ export const LockUserBodySchema = z
 
 export const UserLockResSchema = z.object({
   id: z.string(),
-  email: z.email().nullable().optional(),
+  email: z.string().email().nullable().optional(),
   lockExpirationDate: z
     .string()
     .datetime()
@@ -270,7 +270,7 @@ const RoleOfInfoAdminSchema = z.object({
 export const InfoAdminSchema = z.object({
   id: z.string(),
   fullname: z.string(),
-  email: z.email(),
+  email: z.string().email(),
   role: RoleOfInfoAdminSchema.nullable().optional(),
 });
 
