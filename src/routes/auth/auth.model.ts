@@ -75,14 +75,9 @@ export const RoleSchema = z.object({
   slug: z.string(),
   description: z.string().nullable(),
   isActive: z.boolean(),
-  createdAt: z
-    .string()
-    .datetime()
-    .transform((val) => new Date(val)),
-  updatedAt: z
-    .string()
-    .datetime()
-    .transform((val) => new Date(val)),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().nullable().optional(),
 });
 
 export const DeviceSchema = z.object({

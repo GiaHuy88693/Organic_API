@@ -107,9 +107,9 @@ model Permission {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String    @unique 
   slug        String    @unique
-  displayName String
-  resource    String
-  action      String
+  description String
+  path        String
+  method      HTTPMethod
   // ===== Audit fields =====
   createdById             String?       @db.ObjectId
   createdBy               User?         @relation("PermissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
@@ -405,4 +405,14 @@ enum ViolationType {
   SPAM
   CHEAT
   POLICY_VIOLATION
+}
+
+enum HTTPMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  PATCH
+  OPTIONS
+  HEAD
 }
