@@ -5,7 +5,7 @@ import { RoleName } from '../constants/role.constant';
 export const UserSchema = z.object({
   id: z.string(),
 
-  email: z.email(),
+  email: z.string().email(),
   password: z
     .string()
     .min(6, { message: 'Password must be at least 6 characters long' })
@@ -43,20 +43,9 @@ export const UserSchema = z.object({
   isEmailVerified: z.boolean().default(false),
   isPhoneVerified: z.boolean().default(false),
 
-  createdAt: z
-    .string()
-    .datetime()
-    .transform((val) => new Date(val)),
-  updatedAt: z
-    .string()
-    .datetime()
-    .transform((val) => new Date(val)),
-  deletedAt: z
-    .string()
-    .datetime({ message: 'validation.deletedAt.invalid' })
-    .transform((val) => new Date(val))
-    .nullable()
-    .optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().nullable().optional(),
 });
 
 export type UserType = z.infer<typeof UserSchema>;

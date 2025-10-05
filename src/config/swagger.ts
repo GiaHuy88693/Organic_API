@@ -1,24 +1,26 @@
-import { INestApplication } from '@nestjs/common'
-import { SwaggerModule } from '@nestjs/swagger'
-import expressBasicAuth from 'express-basic-auth'
-import { ConfigGroups } from 'src/shared/config'
-import { swaggerConfig } from './swagger.config'
+import { INestApplication } from '@nestjs/common';
+import { SwaggerModule } from '@nestjs/swagger';
+import expressBasicAuth from 'express-basic-auth';
+import { ConfigGroups } from 'src/shared/config';
+import { swaggerConfig } from './swagger.config';
 
 export function setupSwagger(app: INestApplication) {
-  const { username, password } = ConfigGroups.swagger
+  const { username, password } = ConfigGroups.swagger;
   app.use(
     ['/docs', '/docs-json'],
     expressBasicAuth({
       challenge: true,
       users: { [username]: password },
     }),
-  )
+  );
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig)
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  document.security = [{ authorization: [] }, { 'X-Api-Key': [] }];
 
   SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
     },
-  })
+  });
 }

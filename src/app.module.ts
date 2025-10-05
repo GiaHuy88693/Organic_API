@@ -9,9 +9,11 @@ import { AccessTokenGuard } from './shared/guard/access-token.guard';
 import { ApiKeyGuard } from './shared/guard/api-key.guard';
 import { AuthenticationGuard } from './shared/guard/authentication.guard';
 import { RoleModule } from './routes/role/role.module';
+import { PermissionModule } from './routes/permission/permission.module';
+import { ProductModule } from './routes/product/product.module';
 
 @Module({
-  imports: [SharedModule, AuthModule, RoleModule],
+  imports: [SharedModule, AuthModule, RoleModule, PermissionModule, ProductModule],
   controllers: [],
   providers: [
     AccessTokenGuard,

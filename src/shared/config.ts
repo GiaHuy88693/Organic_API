@@ -36,7 +36,7 @@ const EnvSchema = z.object({
   DATABASE_URL: z.string().url({ message: 'DATABASE_URL must be a valid URL' }),
   EMAIL_HOST: z.string(),
   EMAIL_PORT: z.string().transform(Number),
-  OTP_EMAIL: z.email(),
+  OTP_EMAIL: z.string().email(),
   OTP_EMAIL_PASSWORD: z.string(),
   OTP_EMAIL_NAME: z.string(),
   OTP_EXPIRES_IN: z.string().default('5m'),
@@ -49,7 +49,7 @@ const EnvSchema = z.object({
   ADMIN_PASSWORD: z
     .string()
     .min(8, { message: 'ADMIN_PASSWORD must be at least 8 characters long' }),
-  ADMIN_EMAIL: z.email({
+  ADMIN_EMAIL: z.string().email({
     message: 'ADMIN_EMAIL must be a valid email address',
   }),
   ADMIN_NAME: z.string().min(1, { message: 'ADMIN_NAME must not be empty' }),
