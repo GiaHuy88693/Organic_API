@@ -15,37 +15,37 @@ enum UserStatus {
 }
 
 model User {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  email          String    @unique
-  password       String
-  fullname       String
-  username       String?
-  phoneNumber    String
-  avatar      	 String?   
-	dateOfBirth    DateTime?
-  roleId         String    @db.ObjectId
-  role           Role      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  totpSecret     String?   
-  status         UserStatus @default(INACTIVE)
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  email       String     @unique
+  password    String
+  fullname    String
+  username    String?
+  phoneNumber String
+  avatar      String?
+  dateOfBirth DateTime?
+  roleId      String     @db.ObjectId
+  role        Role       @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  totpSecret  String?
+  status      UserStatus @default(INACTIVE)
 
-  isLocked       Boolean   @default(false)
-  lockExpirationDate  DateTime?  
-  lastViolationId String?  @db.ObjectId  
-  violations     UserViolation[]
-  isEmailVerified Boolean  @default(false)
-  isPhoneVerified Boolean  @default(false)
+  isLocked           Boolean         @default(false)
+  lockExpirationDate DateTime?
+  lastViolationId    String?         @db.ObjectId
+  violations         UserViolation[]
+  isEmailVerified    Boolean         @default(false)
+  isPhoneVerified    Boolean         @default(false)
 
-  createdById     String?  @db.ObjectId
-  createdBy       User?    @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  createdUsers    User[]   @relation("UserCreatedBy")
+  createdById  String? @db.ObjectId
+  createdBy    User?   @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdUsers User[]  @relation("UserCreatedBy")
 
-  updatedById     String?  @db.ObjectId
-  updatedBy       User?    @relation("UserUpdatedBy", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  updatedUsers    User[]   @relation("UserUpdatedBy")
+  updatedById  String? @db.ObjectId
+  updatedBy    User?   @relation("UserUpdatedBy", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedUsers User[]  @relation("UserUpdatedBy")
 
-  deletedAt       DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // Relations
   userRoles       UserRole[]
@@ -57,45 +57,45 @@ model User {
   carts           Cart[]
 
   // Audit relations
-  createdCategories Category[] @relation("CategoryCreatedBy")
-  updatedCategories Category[] @relation("CategoryUpdatedBy")
-  createdProducts   Product[]  @relation("ProductCreatedBy")
-  updatedProducts   Product[]  @relation("ProductUpdatedBy")
-  createdOrders     Order[]    @relation("OrderCreatedBy")
-  updatedOrders     Order[]    @relation("OrderUpdatedBy")
-  createdDetails    OrderDetail[] @relation("OrderDetailCreatedBy")
-  updatedDetails    OrderDetail[] @relation("OrderDetailUpdatedBy")
-  createdCarts      Cart[]     @relation("CartCreatedBy")
-  updatedCarts      Cart[]     @relation("CartUpdatedBy")
-  createdRoles      Role[]     @relation("RoleCreatedBy")
-  updatedRoles      Role[]     @relation("RoleUpdatedBy")
-  createdPermissions Permission[] @relation("PermissionCreatedBy")
-  updatedPermissions Permission[] @relation("PermissionUpdatedBy")
-  createdUserRoles  UserRole[] @relation("UserRoleCreatedBy")
-  updatedUserRoles  UserRole[] @relation("UserRoleUpdatedBy")
+  createdCategories      Category[]       @relation("CategoryCreatedBy")
+  updatedCategories      Category[]       @relation("CategoryUpdatedBy")
+  createdProducts        Product[]        @relation("ProductCreatedBy")
+  updatedProducts        Product[]        @relation("ProductUpdatedBy")
+  createdOrders          Order[]          @relation("OrderCreatedBy")
+  updatedOrders          Order[]          @relation("OrderUpdatedBy")
+  createdDetails         OrderDetail[]    @relation("OrderDetailCreatedBy")
+  updatedDetails         OrderDetail[]    @relation("OrderDetailUpdatedBy")
+  createdCarts           Cart[]           @relation("CartCreatedBy")
+  updatedCarts           Cart[]           @relation("CartUpdatedBy")
+  createdRoles           Role[]           @relation("RoleCreatedBy")
+  updatedRoles           Role[]           @relation("RoleUpdatedBy")
+  createdPermissions     Permission[]     @relation("PermissionCreatedBy")
+  updatedPermissions     Permission[]     @relation("PermissionUpdatedBy")
+  createdUserRoles       UserRole[]       @relation("UserRoleCreatedBy")
+  updatedUserRoles       UserRole[]       @relation("UserRoleUpdatedBy")
   createdRolePermissions RolePermission[] @relation("RolePermissionCreatedBy")
   updatedRolePermissions RolePermission[] @relation("RolePermissionUpdatedBy")
-  createdViolations UserViolation[] @relation("UserViolationCreatedBy")
+  createdViolations      UserViolation[]  @relation("UserViolationCreatedBy")
 
   @@map("users")
 }
 
 model Role {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String    @unique 
-  slug        String    @unique
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String  @unique
+  slug        String  @unique
   description String?
-  isActive    Boolean   @default(true)
-  createdById   String?  @db.ObjectId
-  createdBy     User?    @relation("RoleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  isActive    Boolean @default(true)
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("RoleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  updatedById   String?  @db.ObjectId
-  updatedBy     User?    @relation("RoleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("RoleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       User[]
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  users     User[]
 
   rolePermissions RolePermission[]
   userRoles       UserRole[]
@@ -104,22 +104,21 @@ model Role {
 }
 
 model Permission {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String    @unique 
-  slug        String    @unique
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String     @unique
   description String
   path        String
   method      HTTPMethod
   // ===== Audit fields =====
-  createdById             String?       @db.ObjectId
-  createdBy               User?         @relation("PermissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  createdById String?    @db.ObjectId
+  createdBy   User?      @relation("PermissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  updatedById             String?       @db.ObjectId
-  updatedBy               User?         @relation("PermissionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("PermissionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   rolePermissions RolePermission[]
   userPermissions UserPermission[]
@@ -128,62 +127,62 @@ model Permission {
 }
 
 model RolePermission {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  roleId       String    @db.ObjectId
-  permissionId String    @db.ObjectId
-  grantedAt    DateTime  @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  roleId       String   @db.ObjectId
+  permissionId String   @db.ObjectId
+  grantedAt    DateTime @default(now())
 
-  role        Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   // ===== Audit fields =====
-  createdById               String?             @db.ObjectId
-  createdBy                 User?               @relation("RolePermissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("RolePermissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  updatedById               String?             @db.ObjectId
-  updatedBy                 User?               @relation("RolePermissionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("RolePermissionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@unique([roleId, permissionId])
   @@map("role_permissions")
 }
 
 model UserRole {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId   String   @db.ObjectId
-  roleId   String   @db.ObjectId
-  isActive Boolean  @default(true)
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  roleId     String   @db.ObjectId
+  isActive   Boolean  @default(true)
   assignedAt DateTime @default(now())
 
-  user  User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role  Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   // ===== Audit fields =====
-  createdById        String?    @db.ObjectId
-  createdBy          User?      @relation("UserRoleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("UserRoleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  updatedById        String?    @db.ObjectId
-  updatedBy          User?      @relation("UserRoleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("UserRoleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@unique([userId, roleId])
   @@map("user_roles")
 }
 
 model UserPermission {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String    @db.ObjectId
-  permissionId String    @db.ObjectId
-  grantedAt    DateTime  @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  permissionId String   @db.ObjectId
+  grantedAt    DateTime @default(now())
 
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permissionId])
   @@map("user_permissions")
@@ -199,52 +198,52 @@ model RefreshToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   device Device? @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
 }
 
 model VerificationCode {
-  id    String   @id @default(auto()) @map("_id") @db.ObjectId
-  email String   @unique
+  id    String               @id @default(auto()) @map("_id") @db.ObjectId
+  email String               @unique
   code  String
   type  VerificationCodeType
 
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   deletedAt DateTime?
 
   @@unique([email, code, type])
 }
 
 model UserViolation {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String    @db.ObjectId
-  reason         String
-  violationType  ViolationType     
-  actionTaken    ActionTaken     
-  lockDurationDays Int?     
-  createdById    String     @db.ObjectId
-  createdBy      User?      @relation("UserViolationCreatedBy", fields: [createdById], references: [id])
-  createdAt      DateTime   @default(now())
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String        @db.ObjectId
+  reason           String
+  violationType    ViolationType
+  actionTaken      ActionTaken
+  lockDurationDays Int?
+  createdById      String        @db.ObjectId
+  createdBy        User?         @relation("UserViolationCreatedBy", fields: [createdById], references: [id])
+  createdAt        DateTime      @default(now())
 
-  user           User       @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Device {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String        @db.ObjectId
-  deviceId      String        @unique
-  deviceName    String?
-  userAgent     String
-  ip            String
-  isActive      Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  lastActive    DateTime      @updatedAt
-  deletedAt     DateTime?
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String    @db.ObjectId
+  deviceId   String    @unique
+  deviceName String?
+  userAgent  String
+  ip         String
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  lastActive DateTime  @updatedAt
+  deletedAt  DateTime?
 
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   refreshTokens RefreshToken[]
 
   @@unique([userId, deviceId])
@@ -252,7 +251,7 @@ model Device {
 }
 
 model Category {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
   image       String?
@@ -264,9 +263,9 @@ model Category {
   updatedById String? @db.ObjectId
   updatedBy   User?   @relation("CategoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   products Product[]
 
@@ -274,34 +273,36 @@ model Category {
 }
 
 model Product {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  slug        String  @unique
   description String?
-  price       Int
-  categoryId  String        @db.ObjectId
+  price       Float
+  categoryId  String? @db.ObjectId
+  quantity    Int     @default(0)
 
-  category    Category     @relation(fields: [categoryId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
 
-  createdById String?  @db.ObjectId
-  createdBy   User?    @relation("ProductCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("ProductCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  updatedById String?  @db.ObjectId
-  updatedBy   User?    @relation("ProductUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updatedById String? @db.ObjectId
+  updatedBy   User?   @relation("ProductUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   images       ProductImage[]
   orderDetails OrderDetail[]
   wishlists    Wishlist[]
-  carts       Cart[]
+  carts        Cart[]
 
   @@map("products")
 }
 
 model ProductImage {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  productId String  @db.ObjectId
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  productId String @db.ObjectId
   imagePath String
 
   product Product @relation(fields: [productId], references: [id])
@@ -310,8 +311,8 @@ model ProductImage {
 }
 
 model Order {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String?       @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String? @db.ObjectId
   totalAmount Int
   // ===== Audit fields =====
   createdById String? @db.ObjectId
@@ -320,9 +321,9 @@ model Order {
   updatedById String? @db.ObjectId
   updatedBy   User?   @relation("OrderUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   user    User?         @relation(fields: [userId], references: [id])
   details OrderDetail[]
@@ -331,9 +332,9 @@ model Order {
 }
 
 model OrderDetail {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  orderId   String   @db.ObjectId
-  productId String   @db.ObjectId
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String @db.ObjectId
+  productId String @db.ObjectId
   quantity  Int
   price     Int
 
@@ -344,9 +345,9 @@ model OrderDetail {
   updatedById String? @db.ObjectId
   updatedBy   User?   @relation("OrderDetailUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])
@@ -355,9 +356,9 @@ model OrderDetail {
 }
 
 model Cart {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String  @db.ObjectId
-  productId String  @db.ObjectId
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  productId String @db.ObjectId
   quantity  Int
 
   user    User    @relation(fields: [userId], references: [id])
@@ -370,11 +371,10 @@ model Cart {
   updatedById String? @db.ObjectId
   updatedBy   User?   @relation("CartUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
-
 
 model Wishlist {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
