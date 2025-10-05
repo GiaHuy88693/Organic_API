@@ -8,9 +8,10 @@ import { AuthModule } from './routes/auth/auth.module';
 import { AccessTokenGuard } from './shared/guard/access-token.guard';
 import { ApiKeyGuard } from './shared/guard/api-key.guard';
 import { AuthenticationGuard } from './shared/guard/authentication.guard';
+import { RoleModule } from './routes/role/role.module';
 
 @Module({
-  imports: [SharedModule, AuthModule],
+  imports: [SharedModule, AuthModule, RoleModule],
   controllers: [],
   providers: [
     AccessTokenGuard,
