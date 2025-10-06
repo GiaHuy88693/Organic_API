@@ -31,6 +31,7 @@ import {
 import { RequireClientRole } from 'src/shared/decorator/role.decorator';
 import { MessageResDTO } from '../auth/dto/auth.dto';
 import { ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { ParseObjectIdPipe } from 'src/shared/pipes/objectid.pipe';
 
 @Controller('permission')
 export class PermissionController {
@@ -84,7 +85,7 @@ export class PermissionController {
   })
   @ZodSerializerDto(UpdatePermisionResDTO)
   async updatePermission(
-    @Param('permissionId') permissionId: string,
+    @Param('permissionId', ParseObjectIdPipe) permissionId: string,
     @Body() body: UpdatePermisionBodyDTO,
     @ActiveUser('userId') userId: string,
   ) {
@@ -111,7 +112,9 @@ export class PermissionController {
     type: MessageResDTO,
   })
   @ZodSerializerDto(MessageResDTO)
-  async deletePermission(@Param('permissionId') permissionId: string) {
+  async deletePermission(
+    @Param('permissionId', ParseObjectIdPipe) permissionId: string,
+  ) {
     return await this.permissionService.deletePermission({ id: permissionId });
   }
 
@@ -133,7 +136,7 @@ export class PermissionController {
   })
   @ZodSerializerDto(AssignRoleToPermissionResDTO)
   async assignRoleToPermission(
-    @Param('permissionId') permissionId: string,
+    @Param('permissionId', ParseObjectIdPipe) permissionId: string,
     @Body() body: AssignRoleToPermissionDTO,
   ) {
     return await this.permissionService.assignRoleToPermission(
@@ -177,7 +180,9 @@ export class PermissionController {
     type: GetPermissionDetailResDTO,
   })
   @ZodSerializerDto(GetPermissionDetailResDTO)
-  async findOne(@Param('permissionId') permissionId: string) {
+  async findOne(
+    @Param('permissionId', ParseObjectIdPipe) permissionId: string,
+  ) {
     return await this.permissionService.findOne(permissionId);
   }
 
