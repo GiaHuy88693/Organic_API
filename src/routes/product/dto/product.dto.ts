@@ -6,8 +6,10 @@ import {
   GetProductDetailSchema,
   GetProductQuerySchema,
   GetProductsResSchema,
+  ListImagesResSchema,
   UpdateProductBodySchema,
   UpdateProductResSchema,
+  UploadImagesResSchema,
 } from '../product.model';
 export class CreateProductBodyDTO extends createZodDto(
   CreateProductBodySchema,
@@ -26,3 +28,6 @@ export class GetAllProductsResDTO extends createZodDto(
 export class GetProductDetailResDTO extends createZodDto(
   GetProductDetailSchema,
 ) {}
+
+export class UploadImagesResDTO extends createZodDto(UploadImagesResSchema) {}
+export class ListImagesResDTO extends createZodDto(ListImagesResSchema) {}

@@ -9,9 +9,17 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ZodSerializerDto } from 'nestjs-zod';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Auth } from 'src/shared/decorator/auth.decorator';
 import { AuthTypes } from 'src/shared/constants/auth.constant';
 import { ActiveUser } from 'src/shared/decorator/active-user.decorator';
@@ -28,6 +36,7 @@ import {
   UpdateProductBodyDTO,
   UpdateProductResDTO,
 } from './dto/product.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Product')
 @Controller('product')
@@ -128,5 +137,66 @@ export class ProductController {
   @ZodSerializerDto(GetAllProductsResDTO)
   async getAll() {
     return this.service.getAll();
+  }
+
+  @Auth([AuthTypes.BEARER])
+  @Post(':productId/images')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Upload product images' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        images: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+        },
+      },
+      required: ['images'],
+    },
+  })
+  @UseInterceptors(FilesInterceptor('images', 10))
+  async uploadImages(
+    @Param('productId') productId: string,
+    @UploadedFiles() files: Express.Multer.File[],
+    @ActiveUser('userId') userId: string,
+  ) {
+    return this.service.uploadImages({ productId, files, createdById: userId });
+  }
+
+  @Auth([AuthTypes.BEARER])
+  @Get(':productId/images')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'List product images' })
+  async listImages(@Param('productId') productId: string) {
+    return this.service.listImages(productId);
+  }
+
+  @Auth([AuthTypes.BEARER])
+  @Patch(':productId/images/:imageId/primary')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Set primary product image' })
+  async setPrimaryImage(
+    @Param('productId') productId: string,
+    @Param('imageId') imageId: string,
+    @ActiveUser('userId') userId: string,
+  ) {
+    return this.service.setPrimaryImage({
+      productId,
+      imageId,
+      updatedById: userId,
+    });
+  }
+
+  @Auth([AuthTypes.BEARER])
+  @Delete(':productId/images/:imageId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete product image' })
+  async deleteImage(
+    @Param('productId') productId: string,
+    @Param('imageId') imageId: string,
+  ) {
+    return this.service.deleteImage({ productId, imageId });
   }
 }
