@@ -37,6 +37,7 @@ import {
   UpdateProductResDTO,
 } from './dto/product.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ParseObjectIdPipe } from 'src/shared/pipes/objectid.pipe';
 
 @ApiTags('Product')
 @Controller('product')
@@ -71,7 +72,7 @@ export class ProductController {
   })
   @ZodSerializerDto(UpdateProductResDTO)
   async update(
-    @Param('productId') productId: string,
+    @Param('productId', ParseObjectIdPipe) productId: string,
     @Body() body: UpdateProductBodyDTO,
     @ActiveUser('userId') userId: string,
   ) {
@@ -92,7 +93,7 @@ export class ProductController {
     type: MessageResDTO,
   })
   @ZodSerializerDto(MessageResDTO)
-  async delete(@Param('productId') productId: string) {
+  async delete(@Param('productId', ParseObjectIdPipe) productId: string) {
     return this.service.delete({ id: productId });
   }
 
@@ -120,7 +121,7 @@ export class ProductController {
     type: GetProductDetailResDTO,
   })
   @ZodSerializerDto(GetProductDetailResDTO)
-  async findOne(@Param('productId') productId: string) {
+  async findOne(@Param('productId', ParseObjectIdPipe) productId: string) {
     return this.service.findOne(productId);
   }
 
@@ -158,7 +159,7 @@ export class ProductController {
   })
   @UseInterceptors(FilesInterceptor('images', 10))
   async uploadImages(
-    @Param('productId') productId: string,
+    @Param('productId', ParseObjectIdPipe) productId: string,
     @UploadedFiles() files: Express.Multer.File[],
     @ActiveUser('userId') userId: string,
   ) {
@@ -169,7 +170,7 @@ export class ProductController {
   @Get(':productId/images')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List product images' })
-  async listImages(@Param('productId') productId: string) {
+  async listImages(@Param('productId', ParseObjectIdPipe) productId: string) {
     return this.service.listImages(productId);
   }
 
@@ -178,8 +179,8 @@ export class ProductController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Set primary product image' })
   async setPrimaryImage(
-    @Param('productId') productId: string,
-    @Param('imageId') imageId: string,
+    @Param('productId', ParseObjectIdPipe) productId: string,
+    @Param('imageId', ParseObjectIdPipe) imageId: string,
     @ActiveUser('userId') userId: string,
   ) {
     return this.service.setPrimaryImage({
@@ -194,8 +195,8 @@ export class ProductController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete product image' })
   async deleteImage(
-    @Param('productId') productId: string,
-    @Param('imageId') imageId: string,
+    @Param('productId', ParseObjectIdPipe) productId: string,
+    @Param('imageId', ParseObjectIdPipe) imageId: string,
   ) {
     return this.service.deleteImage({ productId, imageId });
   }
