@@ -128,4 +128,87 @@ export class ProductRepository {
     });
     return rows;
   }
+
+  async addImages({
+    productId,
+    urls,
+    createdById,
+  }: {
+    productId: string;
+    urls: string[];
+    createdById: string | null;
+  }) {
+    await this.prisma.productImage.createMany({
+      data: urls.map((url) => ({
+        url,
+        productId,
+        createdById,
+      })),
+    });
+
+    return await this.prisma.productImage.findMany({
+      where: { productId },
+      orderBy: [{ isPrimary: 'desc' }, { createdAt: 'desc' }],
+    });
+  }
+
+  async listImages(productId: string) {
+    return await this.prisma.productImage.findMany({
+      where: { productId },
+      orderBy: [{ isPrimary: 'desc' }, { createdAt: 'desc' }],
+    });
+  }
+
+  async setPrimaryImage({
+    productId,
+    imageId,
+    updatedById,
+  }: {
+    productId: string;
+    imageId: string;
+    updatedById: string | null;
+  }) {
+    await this.prisma.$transaction([
+      this.prisma.productImage.updateMany({
+        where: { productId },
+        data: { isPrimary: false },
+      }),
+      this.prisma.productImage.update({
+        where: { id: imageId },
+        data: { isPrimary: true },
+      }),
+      this.prisma.product.update({
+        where: { id: productId },
+        data: { updatedById },
+      }),
+    ]);
+  }
+
+  async deleteImage({
+    productId,
+    imageId,
+  }: {
+    productId: string;
+    imageId: string;
+  }) {
+    const img = await this.prisma.productImage.findFirst({
+      where: { id: imageId, productId },
+    });
+    if (!img) return;
+
+    await this.prisma.productImage.delete({ where: { id: imageId } });
+
+    if (img.isPrimary) {
+      const newest = await this.prisma.productImage.findFirst({
+        where: { productId },
+        orderBy: [{ createdAt: 'desc' }],
+      });
+      if (newest) {
+        await this.prisma.productImage.update({
+          where: { id: newest.id },
+          data: { isPrimary: true },
+        });
+      }
+    }
+  }
 }

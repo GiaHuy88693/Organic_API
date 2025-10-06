@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import {
   CreateProductBodyType,
   GetAllProductsResType,
@@ -18,9 +18,17 @@ import {
 } from './product.error';
 import { ProductRepository } from './product.repo';
 
+export interface UploaderService {
+  upload(file: Express.Multer.File): Promise<string>;
+  uploadMany(files: Express.Multer.File[]): Promise<string[]>;
+}
+
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    private readonly productRepository: ProductRepository,
+    @Inject('UploaderService') private readonly uploader: UploaderService,
+  ) {}
 
   private mapToResponseType(product: any): ProductType {
     const { deletedAt, ...data } = product;
@@ -149,6 +157,85 @@ export class ProductService {
     } catch (e) {
       if (e instanceof HttpException) throw e;
       throw InternalRetrieveProductErrorException;
+    }
+  }
+
+  async uploadImages({
+    productId,
+    files,
+    createdById,
+  }: {
+    productId: string;
+    files: Express.Multer.File[];
+    createdById: string;
+  }) {
+    try {
+      const existing = await this.productRepository.findById(productId);
+      if (!existing) throw ProductNotFoundException;
+
+      const urls = await this.uploader.uploadMany(files);
+      const rows = await this.productRepository.addImages({
+        productId,
+        urls,
+        createdById,
+      });
+      return { data: rows, totalItems: rows.length };
+    } catch (e) {
+      if (e instanceof HttpException) throw e;
+      throw InternalUpdateProductErrorException;
+    }
+  }
+
+  async listImages(productId: string) {
+    try {
+      const existing = await this.productRepository.findById(productId);
+      if (!existing) throw ProductNotFoundException;
+      return { data: await this.productRepository.listImages(productId) };
+    } catch (e) {
+      if (e instanceof HttpException) throw e;
+      throw InternalRetrieveProductErrorException;
+    }
+  }
+
+  async setPrimaryImage({
+    productId,
+    imageId,
+    updatedById,
+  }: {
+    productId: string;
+    imageId: string;
+    updatedById: string;
+  }) {
+    try {
+      const existing = await this.productRepository.findById(productId);
+      if (!existing) throw ProductNotFoundException;
+      await this.productRepository.setPrimaryImage({
+        productId,
+        imageId,
+        updatedById,
+      });
+      return { message: 'Primary image set successfully.' };
+    } catch (e) {
+      if (e instanceof HttpException) throw e;
+      throw InternalUpdateProductErrorException;
+    }
+  }
+
+  async deleteImage({
+    productId,
+    imageId,
+  }: {
+    productId: string;
+    imageId: string;
+  }) {
+    try {
+      const existing = await this.productRepository.findById(productId);
+      if (!existing) throw ProductNotFoundException;
+      await this.productRepository.deleteImage({ productId, imageId });
+      return { message: 'Image deleted successfully.' };
+    } catch (e) {
+      if (e instanceof HttpException) throw e;
+      throw InternalDeleteProductErrorException;
     }
   }
 }

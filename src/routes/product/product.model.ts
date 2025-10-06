@@ -1,18 +1,31 @@
 import z from 'zod';
 
-export const ProductSchema = z.object({
+export const ProductImageSchema = z.object({
   id: z.string(),
-  name: z.string().min(1),
-  description: z.string().optional().nullable(),
-  price: z.number().nonnegative(),
-  quantity: z.number().int().nonnegative(),
-  slug: z.string(),
-  createdById: z.string().nullable().optional(),
-  updatedById: z.string().nullable().optional(),
+  url: z.string().url(),
+  isPrimary: z.boolean(),
+  productId: z.string(),
   createdAt: z.date(),
-  updatedAt: z.date(),
-  deletedAt: z.date().nullable().optional(),
-})
+  createdById: z.string(),
+});
+
+export const ProductSchema = z
+  .object({
+    id: z.string(),
+    name: z.string().min(1),
+    description: z.string().optional().nullable(),
+    price: z.number().nonnegative(),
+    quantity: z.number().int().nonnegative(),
+    slug: z.string(),
+    createdById: z.string().nullable().optional(),
+    updatedById: z.string().nullable().optional(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    deletedAt: z.date().nullable().optional(),
+  })
+  .extend({
+    images: z.array(ProductImageSchema).optional(),
+  });
 
 export const ProductResponseSchema = ProductSchema.omit({
   deletedAt: true,
@@ -76,6 +89,11 @@ export const GetAllProductsResSchema = z.object({
   totalItems: z.number(),
 });
 
+export const ListImagesResSchema = z.object({
+  data: z.array(ProductSchema),
+});
+
+export const UploadImagesResSchema = GetAllProductsResSchema;
 export const CreateProductResSchema = ProductResponseSchema;
 export const UpdateProductResSchema = ProductResponseSchema;
 export const GetProductDetailSchema = ProductResponseSchema;
