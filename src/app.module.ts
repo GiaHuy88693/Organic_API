@@ -12,9 +12,10 @@ import { RoleModule } from './routes/role/role.module';
 import { PermissionModule } from './routes/permission/permission.module';
 import { ProductModule } from './routes/product/product.module';
 import { CategoryModule } from './routes/category/category.module';
+import { WithlistModule } from './routes/withlist/withlist.module';
 
 @Module({
-  imports: [SharedModule, AuthModule, RoleModule, PermissionModule, ProductModule, CategoryModule],
+  imports: [SharedModule, AuthModule, RoleModule, PermissionModule, ProductModule, CategoryModule, WithlistModule],
   controllers: [],
   providers: [
     AccessTokenGuard,
