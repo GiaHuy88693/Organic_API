@@ -13,9 +13,10 @@ import { PermissionModule } from './routes/permission/permission.module';
 import { ProductModule } from './routes/product/product.module';
 import { CategoryModule } from './routes/category/category.module';
 import { WithlistModule } from './routes/withlist/withlist.module';
+import { CartModule } from './routes/cart/cart.module';
 
 @Module({
-  imports: [SharedModule, AuthModule, RoleModule, PermissionModule, ProductModule, CategoryModule, WithlistModule],
+  imports: [SharedModule, AuthModule, RoleModule, PermissionModule, ProductModule, CategoryModule, WithlistModule, CartModule],
   controllers: [],
   providers: [
     AccessTokenGuard,
