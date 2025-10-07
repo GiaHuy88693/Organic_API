@@ -315,7 +315,7 @@ model ProductImage {
 model Order {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   userId      String? @db.ObjectId
-  totalAmount Int
+  totalAmount Float
   // ===== Audit fields =====
   createdById String? @db.ObjectId
   createdBy   User?   @relation("OrderCreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
@@ -338,7 +338,7 @@ model OrderDetail {
   orderId   String @db.ObjectId
   productId String @db.ObjectId
   quantity  Int
-  price     Int
+  price     Float
 
   // ===== Audit fields =====
   createdById String? @db.ObjectId
