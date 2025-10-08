@@ -15,6 +15,7 @@ import { CategoryModule } from './routes/category/category.module';
 import { WithlistModule } from './routes/withlist/withlist.module';
 import { CartModule } from './routes/cart/cart.module';
 import { OrderModule } from './routes/order/order.module';
+import { PermissionGuard } from './shared/guard/permission.guard';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { OrderModule } from './routes/order/order.module';
       provide: APP_GUARD,
       useClass: AuthenticationGuard,
     },
+    { provide: APP_GUARD, useClass: PermissionGuard },
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
   ],

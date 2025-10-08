@@ -104,7 +104,7 @@ export class RoleRepository {
       data: {
         ...data,
         createdById,
-        deletedAt: null
+        deletedAt: null,
       },
     });
   }
@@ -373,21 +373,43 @@ export class RoleRepository {
   private async fetchPermissionsForRole(
     roleName: RoleName,
     select: Prisma.PermissionSelect,
-  ): Promise<Partial<Permission>[]> {
+  ) {
+    // Luôn normalize về lowercase
+    const slug = String(roleName).trim().toLowerCase(); // 'admin' | 'client'
+
+    const role = await this.prismaService.role.findFirst({
+      where: {
+        OR: [{ slug }, { name: slug }, { name: roleName }],
+        isActive: true,
+      },
+      select: { id: true, name: true, slug: true },
+    });
+
+    if (!role) {
+      this.logger.warn(`Role not found: ${roleName}`);
+      await this.cacheManager.del(`permissions_full_${roleName}`);
+      await this.cacheManager.del(`permissions_names_${roleName}`);
+      return [];
+    }
+
     const rolePermissions = await this.prismaService.rolePermission.findMany({
       where: {
-        role: { name: roleName, deletedAt: null },
+        roleId: role.id,
         permission: { deletedAt: null },
       },
       select: { permission: { select } },
     });
 
     if (rolePermissions.length === 0) {
-      this.logger.warn(`Role not found or has no permissions: ${roleName}`);
+      this.logger.warn(
+        `Role has no permissions: ${roleName} (id=${role.id}, slug=${role.slug})`,
+      );
+      await this.cacheManager.del(`permissions_full_${roleName}`);
+      await this.cacheManager.del(`permissions_names_${roleName}`);
       return [];
     }
 
-    return rolePermissions.map((rp) => rp.permission) as Partial<Permission>[];
+    return rolePermissions.map((rp) => rp.permission) as any[];
   }
 
   async getPermissionTriplesByRoleName(

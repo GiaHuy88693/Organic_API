@@ -272,12 +272,9 @@ export class RoleService {
 
     const routeKeys = triples
       .map((t) =>
-        `${this.normalizeString(t.path, { toLowerCase: true, trim: true })} ${this.normalizeString(
-          t.method,
-          {
-            toLowerCase: true,
-            trim: true,
-          },
+        `${this.normalizeString(t.method, { toLowerCase: true, trim: true })} ${this.normalizeString(
+          t.path,
+          { toLowerCase: true, trim: true },
         )}`.trim(),
       )
       .filter((k) => k.length > 1 && !k.startsWith(' '));
