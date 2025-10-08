@@ -73,7 +73,16 @@ const EnvSchema = z.object({
   CLOUDINARY_PDF_FOLDER: z.string().default('pdfs'),
   SECRET_API_KEY: z.string().min(10),
   SWAGGER_USERNAME: z.string().min(1, 'SWAGGER_USERNAME cannot be empty'),
-  SWAGGER_PASSWORD: z.string().min(8, 'SWAGGER_PASSWORD must be at least 8 characters'),
+  SWAGGER_PASSWORD: z
+    .string()
+    .min(8, 'SWAGGER_PASSWORD must be at least 8 characters'),
+  MOMO_PARTNER_CODE: z.string(),
+  MOMO_ACCESS_KEY: z.string(),
+  MOMO_SECRET_KEY: z.string(),
+  MOMO_CREATE_URL: z.string(),
+  APP_BASE_URL: z.string(),
+  MOMO_REDIRECT_URL: z.string(),
+  MOMO_IPN_URL: z.string(),
 });
 
 // Parse and validate process.env
@@ -111,6 +120,13 @@ export const envConfig = {
     pdfFolder: parsedEnv.data.CLOUDINARY_PDF_FOLDER,
   },
   secretApiKey: parsedEnv.data.SECRET_API_KEY,
+  momoPartnerCode: parsedEnv.data.MOMO_PARTNER_CODE,
+  momoAccessKey: parsedEnv.data.MOMO_ACCESS_KEY,
+  momoSecretKey: parsedEnv.data.MOMO_SECRET_KEY,
+  momoCreateUrl: parsedEnv.data.MOMO_CREATE_URL,
+  appBaseUrl: parsedEnv.data.APP_BASE_URL,
+  momoRedirectUrl: parsedEnv.data.MOMO_REDIRECT_URL,
+  momoIpnUrl: parsedEnv.data.MOMO_IPN_URL,
 };
 
 export const ConfigGroups = {

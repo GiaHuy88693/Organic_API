@@ -16,6 +16,7 @@ import { WithlistModule } from './routes/withlist/withlist.module';
 import { CartModule } from './routes/cart/cart.module';
 import { OrderModule } from './routes/order/order.module';
 import { PermissionGuard } from './shared/guard/permission.guard';
+import { PaymentModule } from './routes/payment/payment.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PermissionGuard } from './shared/guard/permission.guard';
     WithlistModule,
     CartModule,
     OrderModule,
+    PaymentModule
   ],
   controllers: [],
   providers: [
@@ -42,7 +44,7 @@ import { PermissionGuard } from './shared/guard/permission.guard';
       provide: APP_GUARD,
       useClass: AuthenticationGuard,
     },
-    { provide: APP_GUARD, useClass: PermissionGuard },
+    // { provide: APP_GUARD, useClass: PermissionGuard },
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
   ],
