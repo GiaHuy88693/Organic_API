@@ -112,6 +112,9 @@ export class ProductRepository {
         skip,
         take: limit,
         orderBy: [{ createdAt: 'desc' }, { name: 'asc' }],
+        include: {
+          images: { orderBy: [{ isPrimary: 'desc' }, { createdAt: 'desc' }] },
+        },
       }),
       this.prisma.product.count({ where }),
     ]);
@@ -125,6 +128,11 @@ export class ProductRepository {
   async getAll(): Promise<ProductType[]> {
     const rows = await this.prisma.product.findMany({
       where: { deletedAt: null },
+      include: {
+        images: {
+          orderBy: [{ isPrimary: 'desc' }, { createdAt: 'desc' }],
+        },
+      },
     });
     return rows;
   }

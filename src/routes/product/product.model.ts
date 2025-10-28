@@ -6,7 +6,7 @@ export const ProductImageSchema = z.object({
   isPrimary: z.boolean(),
   productId: z.string(),
   createdAt: z.date(),
-  createdById: z.string(),
+  createdById: z.string().nullable(),
 });
 
 export const ProductSchema = z
@@ -16,6 +16,7 @@ export const ProductSchema = z
     description: z.string().optional().nullable(),
     price: z.number().nonnegative(),
     quantity: z.number().int().nonnegative(),
+    categoryId: z.string().nullable().optional(),
     slug: z.string(),
     createdById: z.string().nullable().optional(),
     updatedById: z.string().nullable().optional(),
@@ -54,30 +55,10 @@ export const GetProductsResSchema = z.object({
 });
 
 export const GetProductQuerySchema = z.object({
-  page: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : 1))
-    .refine((val) => val > 0, { message: 'Page must be a positive number' }),
-  limit: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : 10))
-    .refine((val) => val > 0 && val <= 100, {
-      message: 'Limit must be between 1 and 100',
-    }),
-  search: z
-    .string()
-    .optional()
-    .transform((val) => (val ? val.trim() : undefined))
-    .refine((val) => !val || val.length >= 2, {
-      message: 'Search term must be at least 2 characters long',
-    }),
-  includeDeleted: z
-    .string()
-    .optional()
-    .transform((val) => val === 'true')
-    .default('false'),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  search: z.string().trim().min(2).optional(),
+  includeDeleted: z.coerce.boolean().default(false),
 });
 
 export const GetAllProductsResSchema = z.object({

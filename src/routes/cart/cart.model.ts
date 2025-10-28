@@ -31,6 +31,16 @@ export const CartListResSchema = z.object({
         id: z.string(),
         name: z.string(),
         price: z.number(),
+        images: z
+          .array(
+            z.object({
+              id: z.string(),
+              url: z.string(),
+              isPrimary: z.boolean(),
+              createdAt: z.date(),
+            }),
+          )
+          .optional(),
       }),
       quantity: z.number().int().min(1),
     }),
