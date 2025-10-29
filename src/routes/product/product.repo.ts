@@ -98,7 +98,9 @@ export class ProductRepository {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    if (!includeDeleted) where.deletedAt = null;
+    if (!includeDeleted == !true) {
+      where.deletedAt = null;
+    }
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },

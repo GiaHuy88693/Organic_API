@@ -56,7 +56,7 @@ export class PaymentService {
       partnerCode,
       accessKey,
       requestId,
-      amount: String(amount),
+      amount: Number(amount),
       orderId,
       orderInfo,
       redirectUrl,

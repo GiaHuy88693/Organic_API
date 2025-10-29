@@ -76,13 +76,16 @@ const EnvSchema = z.object({
   SWAGGER_PASSWORD: z
     .string()
     .min(8, 'SWAGGER_PASSWORD must be at least 8 characters'),
+  // MoMo
   MOMO_PARTNER_CODE: z.string(),
   MOMO_ACCESS_KEY: z.string(),
   MOMO_SECRET_KEY: z.string(),
-  MOMO_CREATE_URL: z.string(),
-  APP_BASE_URL: z.string(),
-  MOMO_REDIRECT_URL: z.string(),
-  MOMO_IPN_URL: z.string(),
+  MOMO_CREATE_URL: z.string().url(), // <- ép là URL
+  APP_BASE_URL: z.string().url(), // <- ép là URL công khai
+
+  // (tuỳ chọn) cho backward-compat: không dùng nữa
+  MOMO_REDIRECT_URL: z.string().optional(),
+  MOMO_IPN_URL: z.string().optional(),
 });
 
 // Parse and validate process.env
@@ -120,13 +123,20 @@ export const envConfig = {
     pdfFolder: parsedEnv.data.CLOUDINARY_PDF_FOLDER,
   },
   secretApiKey: parsedEnv.data.SECRET_API_KEY,
+  // MoMo
   momoPartnerCode: parsedEnv.data.MOMO_PARTNER_CODE,
   momoAccessKey: parsedEnv.data.MOMO_ACCESS_KEY,
   momoSecretKey: parsedEnv.data.MOMO_SECRET_KEY,
   momoCreateUrl: parsedEnv.data.MOMO_CREATE_URL,
   appBaseUrl: parsedEnv.data.APP_BASE_URL,
-  momoRedirectUrl: parsedEnv.data.MOMO_REDIRECT_URL,
-  momoIpnUrl: parsedEnv.data.MOMO_IPN_URL,
+
+  // Build động từ APP_BASE_URL (không đọc từ .env)
+  get momoRedirectUrl() {
+    return `http://127.0.0.1:5500/src/pages/cart/thankyou.html`;
+  },
+  get momoIpnUrl() {
+    return `${this.appBaseUrl.replace(/\/+$/, '')}/payments/momo/ipn`;
+  },
 };
 
 export const ConfigGroups = {

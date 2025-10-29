@@ -12,7 +12,7 @@ export class PaymentController {
     const { amount, orderInfo } = dto;
     const result = await this.momo.createPayment(amount, orderInfo);
     return result;
-  }
+  } 
 
   // IPN (server-to-server) – MoMo sẽ POST vào đây
   @Post('ipn')
